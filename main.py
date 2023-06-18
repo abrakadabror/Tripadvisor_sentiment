@@ -73,7 +73,6 @@ def analyze_text(text):
         return 'Netagive'
     else:
         return 'Neutral'
-# uczenie maczynowe NLP  natural langiuage processing i polega na przetwarzaniu jezyka aby znaleźc w nim sens
 df['Sentiment'] = df['Comment'].apply(analyze_text)
 
 print(df.head(50))
