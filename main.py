@@ -84,3 +84,5 @@ conn = sqlite3.connect('comments.sqlite')
 df.to_sql('CommentsTable', conn, if_exists='append', index = False)
 
 conn.close()
+
+print('end')
