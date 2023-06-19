@@ -42,7 +42,6 @@ for i in range(PAGE_AMOUT):
             continue# jesli nie znaleźlismy spana z komenatrzem to przejdziemy do nastepnego elementu
         review = review_span.get_text(strip = True)
         reviews_on_single_page.append(review)
-    # print(reviews_on_single_page)
     # print(len(reviews_on_single_page))
     reviews_amout = len(reviews_on_single_page)
     page_ids = [i +1]* reviews_amout # tworztmy liste cyfr, lista ma taka dlugosc jak reviews_amount
