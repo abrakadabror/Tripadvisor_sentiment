@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.action_chains import ActionChains
+from textblob import TextBlob
 
 import time
 from bs4 import BeautifulSoup
@@ -41,8 +42,45 @@ for i in range(PAGE_AMOUT):
             continue# jesli nie znaleźlismy spana z komenatrzem to przejdziemy do nastepnego elementu
         review = review_span.get_text(strip = True)
         reviews_on_single_page.append(review)
-    print(reviews_on_single_page)
-    print(len(reviews_on_single_page))
-    break
-time.sleep(1)
+    # print(len(reviews_on_single_page))
+    reviews_amout = len(reviews_on_single_page)
+    page_ids = [i +1]* reviews_amout # tworztmy liste cyfr, lista ma taka dlugosc jak reviews_amount
+    reviews.extend(reviews_on_single_page) 
+    page.extend(page_ids)
+    time.sleep(2)
+    przycisk_strona = driver.find_element(By.XPATH, '//*[@id="tab-data-qa-reviews-0"]/div/div[5]/div/div[11]/div[1]/div/div[1]/div[2]/div/a')
+    actions = ActionChains(driver) #definiujemy, ze wydarzy sie jais ciag zdarzen/ tworzymi liste zadan
+    actions.move_to_element(przycisk_strona) #w naszym zadaniu jest to tlko jedno zdarzene czyli move_to_element, zjedziemy do elementu / dopisujemy zadania do listy
+    actions.perform()
+    przycisk_strona.click()
+    time.sleep(3)
+driver.quit()
+#print(len(page))
 
+data = {'ID': page, 'Comment': reviews } # id 1 kolumna i w komentarzu recenzja
+df = pd.DataFrame(data)
+print(df.head(50))
+
+#
+
+def analyze_text(text):
+    blob = TextBlob(text) # rozdziela text na pasujace skrawki
+    sentiment = blob.sentiment.polarity # ktoś zrobił funkcje jak sentiment.polarity i aplikujey je na nasz tekst
+    if sentiment > 0: 
+        return 'Positive'
+    elif sentiment < 0:
+        return 'Netagive'
+    else:
+        return 'Neutral'
+df['Sentiment'] = df['Comment'].apply(analyze_text)
+
+print(df.head(50))
+df.to_excel('baza_danych.xlsx', index = False)
+
+conn = sqlite3.connect('comments.sqlite')
+
+df.to_sql('CommentsTable', conn, if_exists='append', index = False)
+
+conn.close()
+
+print('end')
